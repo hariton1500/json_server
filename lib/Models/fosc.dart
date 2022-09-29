@@ -40,7 +40,7 @@ class Fosc {
   });
 
   Fosc.fromJson(Map<String, dynamic> json) {
-    print('loading Mufta from json:');
+    print('loading FOSC from json:');
     //print(json);
     name = json['name'];
     cableEnds =
@@ -60,8 +60,4 @@ class Fosc {
       'key': key
     };
   }
-
-
-
-
 }

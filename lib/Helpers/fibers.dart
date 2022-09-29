@@ -1,8 +1,21 @@
-import 'package:flutter/material.dart';
+enum Colors {
+  red,
+  green,
+  blue,
+  yellow,
+  white,
+  grey,
+  brown,
+  purple,
+  cyan,
+  black,
+  orange,
+  pink
+}
 
 List<int> fibers = [1, 2, 4, 8, 12, 16, 20, 24];
 
-Map<String, List<Color>> fiberColors = {
+Map<String, List<Colors>> fiberColors = {
   'DIN/VDE 08888': [
     Colors.red,
     Colors.green,
@@ -12,10 +25,10 @@ Map<String, List<Color>> fiberColors = {
     Colors.grey,
     Colors.brown,
     Colors.purple,
-    Colors.cyanAccent,
+    Colors.cyan,
     Colors.black,
     Colors.orange,
-    Colors.pink[200]!,
+    Colors.pink,
     Colors.red,
     Colors.green,
     Colors.blue,
@@ -24,10 +37,10 @@ Map<String, List<Color>> fiberColors = {
     Colors.grey,
     Colors.brown,
     Colors.purple,
-    Colors.cyanAccent,
+    Colors.cyan,
     Colors.black,
     Colors.orange,
-    Colors.pink[200]!
+    Colors.pink
   ],
   'SNR': [
     Colors.blue,
@@ -40,8 +53,8 @@ Map<String, List<Color>> fiberColors = {
     Colors.black,
     Colors.yellow,
     Colors.purple,
-    Colors.pink[200]!,
-    Colors.cyan[100]!,
+    Colors.pink,
+    Colors.cyan,
     Colors.blue,
     Colors.orange,
     Colors.green,
@@ -52,7 +65,7 @@ Map<String, List<Color>> fiberColors = {
     Colors.black,
     Colors.yellow,
     Colors.purple,
-    Colors.pink[200]!,
-    Colors.cyan[100]!,
+    Colors.pink,
+    Colors.cyan,
   ]
 };
