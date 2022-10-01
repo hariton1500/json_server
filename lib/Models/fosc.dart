@@ -40,8 +40,6 @@ class Fosc {
   });
 
   Fosc.fromJson(Map<String, dynamic> json) {
-    print('loading FOSC from json:');
-    //print(json);
     name = json['name'];
     cableEnds =
         List<CableEnd>.from(json['cables'].map((x) => CableEnd.fromJson(x)));
