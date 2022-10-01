@@ -118,7 +118,7 @@ Future<String> run() async {
           await req.response.close();
           break;
         case 'add':
-          print('adding new cablle');
+          print('adding new cable');
           fileCablesContent[req.requestedUri.queryParameters['key']!] = (Cable.fromJson(
               json.decode(Utf8Decoder().convert(await req.last))));
           targetCablesFile.writeAsString(json.encode(fileCablesContent));
