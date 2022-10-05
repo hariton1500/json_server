@@ -6,8 +6,12 @@ import 'Models/cable.dart';
 import 'Models/fosc.dart';
 import 'Models/node.dart';
 import 'Models/records.dart';
+import 'Models/user.dart';
 
 Future<String> run() async {
+
+  List<User> users;
+  
   Map<String, FoscRecord> fileFoscsContent = {};
   Map<String, NodeRecord> fileNodesContent = {};
   Map<String, CableRecord> fileCablesContent = {};
