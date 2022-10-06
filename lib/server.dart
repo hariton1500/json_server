@@ -9,9 +9,8 @@ import 'Models/records.dart';
 import 'Models/user.dart';
 
 Future<String> run() async {
-
   List<User> users;
-  
+
   Map<String, FoscRecord> fileFoscsContent = {};
   Map<String, NodeRecord> fileNodesContent = {};
   Map<String, CableRecord> fileCablesContent = {};
@@ -76,7 +75,10 @@ Future<String> run() async {
           print(
               'foscs list requested from ${req.headers['host']} by ${req.headers['login']}');
           req.response.writeAll(
-              fileFoscsContent.values.map((e) => json.encode(e.object)), '\n');
+              fileFoscsContent.values
+                  .where((element) => !element.isDeleted)
+                  .map((e) => json.encode(e.object)),
+              '\n');
           break;
         case 'add':
           print('adding new fosc');
@@ -95,6 +97,13 @@ Future<String> run() async {
                       json.decode(Utf8Decoder().convert(await req.last)))));
           targetFoscsFile.writeAsString(json.encode(fileFoscsContent));
           break;
+        case 'remove':
+          print(
+              'removing fosc with key=${req.requestedUri.queryParameters['key']}');
+          fileFoscsContent[req.requestedUri.queryParameters['key']!]
+              ?.isDeleted = true;
+          targetFoscsFile.writeAsString(json.encode(fileFoscsContent));
+          break;
       }
       //await req.response.close();
     }
@@ -106,7 +115,9 @@ Future<String> run() async {
               'nodes list requested from ${req.headers['host']} by ${req.headers['login']}');
           if (fileNodesContent.isNotEmpty) {
             req.response.writeAll(
-                fileNodesContent.values.map((e) => json.encode(e.object)),
+                fileNodesContent.values
+                    .where((element) => !element.isDeleted)
+                    .map((e) => json.encode(e.object)),
                 '\n');
             await req.response.close();
           }
@@ -128,6 +139,13 @@ Future<String> run() async {
                       json.decode(Utf8Decoder().convert(await req.last)))));
           targetNodesFile.writeAsString(json.encode(fileNodesContent));
           break;
+        case 'remove':
+          print(
+              'removing node with key=${req.requestedUri.queryParameters['key']}');
+          fileNodesContent[req.requestedUri.queryParameters['key']!]
+              ?.isDeleted = true;
+          targetNodesFile.writeAsString(json.encode(fileNodesContent));
+          break;
       }
     }
 
@@ -138,7 +156,10 @@ Future<String> run() async {
           print(
               'cables list requested from ${req.headers['host']} by ${req.headers['login']}');
           req.response.writeAll(
-              fileCablesContent.values.map((e) => json.encode(e.object)), '\n');
+              fileCablesContent.values
+                  .where((element) => !element.isDeleted)
+                  .map((e) => json.encode(e.object)),
+              '\n');
           await req.response.close();
           break;
         case 'add':
@@ -152,11 +173,18 @@ Future<String> run() async {
           break;
         case 'put':
           print(
-              'putting fosc with key=${req.requestedUri.queryParameters['key']}');
+              'putting cable with key=${req.requestedUri.queryParameters['key']}');
           fileCablesContent[req.requestedUri.queryParameters['key']!] =
               (CableRecord(
                   object: Cable.fromJson(
                       json.decode(Utf8Decoder().convert(await req.last)))));
+          targetCablesFile.writeAsString(json.encode(fileCablesContent));
+          break;
+        case 'remove':
+          print(
+              'removing cable with key=${req.requestedUri.queryParameters['key']}');
+          fileCablesContent[req.requestedUri.queryParameters['key']!]
+              ?.isDeleted = true;
           targetCablesFile.writeAsString(json.encode(fileCablesContent));
           break;
       }
