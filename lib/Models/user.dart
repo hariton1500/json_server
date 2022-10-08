@@ -1,7 +1,7 @@
 class User {
   String? login;
   String? password;
-  Map<String, bool> access = {'create': true, 'edit': true, 'remove': false};
+  Map<String, dynamic> access = {};
 
   User({required this.login, required this.password, Map<String, bool>? newAccess}) {
     access.addEntries(newAccess!.entries);
