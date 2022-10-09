@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Manager</title>
+    <style>
+        table, th, td {
+            border: 1px solid;
+            border-collapse: collapse;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    Admin password:
+    <input type="password" id="adminPassword" placeholder="Admin password" required>
+    <br><br>
+    <fieldset style="width: 300px">
+        <legend>Create user</legend>
+        New user login:
+        <input type="text" id="newUserLogin" placeholder="New user login"><br>
+        New user password:
+        <input type="password" id="newUserPassword" placeholder="New user password"><br>
+        <fieldset>
+            <legend>User permissions</legend>
+            <input type="checkbox" id="newUserPermsCreate">
+            <label for="newUserPermsCreate">Create</label>
+            <input type="checkbox" id="newUserPermsEdit">
+            <label for="newUserPermsEdit">Edit</label>
+            <input type="checkbox" id="newUserPermsRemove">
+            <label for="newUserPermsRemove">Remove</label>
+        </fieldset><br>
+        <input type="button" value="Create" onclick="createNewUser()">
+    </fieldset><br>
+    <input type="button" value="Load users table" id="loadUsersButton" onclick="loadUsersTable()">
+    <table id="usersTable" style="display: none">
+        <thead>
+            <tr>
+                <th>User login</th>
+                <th>Create</th>
+                <th>Edit</th>
+                <th>Remove</th>
+            </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
+    </table>
+    <script>
+        var adminPassword = document.getElementById("adminPassword");
+
+        var newUserLogin    = document.getElementById("newUserLogin");
+        var newUserPassword = document.getElementById("newUserPassword");
+
+        var newUserPermsCreate = document.getElementById("newUserPermsCreate");
+        var newUserPermsEdit   = document.getElementById("newUserPermsEdit");
+        var newUserPermsRemove = document.getElementById("newUserPermsRemove");
+
+        var usersTable      = document.getElementById("usersTable");
+        var usersTableBody  = document.getElementById("usersTableBody");
+        var loadUsersButton = document.getElementById("loadUsersButton");
+
+        function httpGet(theUrl)
+        {
+            if (adminPassword.value == "") {
+                alert("Admin password required");
+                return;
+            }
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", theUrl, false );
+            xmlHttp.setRequestHeader("adminpass", adminPassword.value);
+            xmlHttp.send( null );
+            if (xmlHttp.responseText == "-100") {
+                alert("Password is incorrect");
+                return false;
+            }
+            return xmlHttp.responseText;
+        }
+
+        function editUser(login) {
+            var win = window.open("", "Edit User", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=400,height=230,top="+(screen.height/3)+",left="+(screen.width/3));
+            win.document.title = "Edit User";
+            win.document.body.innerHTML = `
+            <fieldset style="width: 350px">
+                <legend>Edit user</legend>
+                User login:
+                <input type="text" id="newUserLogin" placeholder="User login" value="${login}"><br>
+                New password (lave blank to keep current):
+                <input type="password" id="newUserPassword" placeholder="User new password"><br>
+                <fieldset>
+                    <legend>User permissions</legend>
+                    <input type="checkbox" id="newUserPermsCreate">
+                    <label for="newUserPermsCreate">Create</label>
+                    <input type="checkbox" id="newUserPermsEdit">
+                    <label for="newUserPermsEdit">Edit</label>
+                    <input type="checkbox" id="newUserPermsRemove">
+                    <label for="newUserPermsRemove">Remove</label>
+                </fieldset><br>
+                <input type="button" value="Save" onclick="createNewUser()">
+            </fieldset>`;
+        }
+
+        function deleteUser(user) {
+            if (adminPassword.value == "") {
+                alert("Admin password required");
+                return;
+            }
+            if (confirm('Are you sure?')) {
+                if (httpGet(`/users/del?user=${user}`)) {
+                    alert('User deleted');
+                    loadUsersTable();
+                }
+            }
+        }
+
+        function loadUsersTable() {
+            if (adminPassword.value == "") {
+                alert("Admin password required");
+                return;
+            }
+            if (resp = JSON.parse(httpGet("/users/list"))) {
+                usersTableBody.innerHTML = "";
+                for (var login in resp) {
+                    var row = usersTableBody.insertRow();
+                    var cell = row.insertCell();
+                    cell.innerHTML = login;
+                    var cell = row.insertCell();
+                    cell.innerHTML = resp[login].access.create;
+                    var cell = row.insertCell();
+                    cell.innerHTML = resp[login].access.edit;
+                    var cell = row.insertCell();
+                    cell.innerHTML = resp[login].access.remove;
+                    var cell = row.insertCell();
+                    cell.innerHTML = `<input type="button" value="Edit" onclick="editUser('${login}')">`;
+                    var cell = row.insertCell();
+                    cell.innerHTML = `<input type="button" value="Delete" onclick="deleteUser('${login}')">`;
+                }
+                loadUsersButton.style.display = "none";
+                usersTable.style.display = "table";
+            }
+        }
+
+        function createNewUser() {
+            if (newUserLogin.value == "") {
+                alert("New user login required");
+                return;
+            }
+            if (newUserPassword.value == "") {
+                alert("New user password required");
+                return;
+            }
+            if (resp = httpGet(`/users/add?login=${newUserLogin.value}&password=${newUserPassword.value}&access=${+newUserPermsCreate.checked}${+newUserPermsEdit.checked}${+newUserPermsRemove.checked}`)) {
+                if (resp == "-1") {
+                    alert("User already exists");
+                    return;
+                }
+                newUserLogin.value = "";
+                newUserPassword.value = "";
+                if (usersTable.style.display == "table") {
+                    loadUsersTable();
+                }
+                alert('User added');
+            }
+        }
+    </script>
+</body>
+</html>
