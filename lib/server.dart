@@ -11,6 +11,7 @@ import 'Models/user.dart';
 import 'Helpers/md5.dart';
 
 Future<String> run() async {
+  String adminpass = '';  
   Map<String, User> users = {};
   Map<String, FoscRecord> fileFoscsContent = {};
   Map<String, NodeRecord> fileNodesContent = {};
@@ -18,6 +19,10 @@ Future<String> run() async {
 
   HttpServer server;
 
+  final adminFile = File(
+      path.join(path.dirname(Platform.script.toFilePath()), 'admin.json'));
+  final usersPageFile = File(
+      path.join(path.dirname(Platform.script.toFilePath()), 'html/users.html'));
   final usersFile = File(
       path.join(path.dirname(Platform.script.toFilePath()), 'users.json'));
   final targetFoscsFile = File(
@@ -26,6 +31,10 @@ Future<String> run() async {
       path.join(path.dirname(Platform.script.toFilePath()), 'dataNodes.json'));
   final targetCablesFile = File(
       path.join(path.dirname(Platform.script.toFilePath()), 'dataCables.json'));
+
+  if (await adminFile.exists()) {
+    adminpass = jsonDecode(await adminFile.readAsString())['password'];
+  }
 
   if (await usersFile.exists()) {
     users = (jsonDecode(await usersFile.readAsString()) as Map)
@@ -80,7 +89,75 @@ Future<String> run() async {
       preserveHeaderCase: true,
     );
 
-    if (users[req.headers.value('login')]?.password == generateMd5(req.headers.value('password'))) {
+    if (req.uri.path == '/users' || req.uri.path == '/users/') {
+      req.response.headers.contentType = ContentType.html;
+      req.response.write(await usersPageFile.readAsString());
+    }
+    if (req.uri.path == '/users/list') {
+      if (req.headers['adminpass'] != null && generateMd5(req.headers.value('adminpass')) == adminpass) {
+        print(users);
+        req.response.headers.contentType = ContentType.json;
+        req.response.write(await usersFile.readAsString());
+      } else {
+        print('unauthorized');
+        req.response.write('-100');
+      }
+    }
+    if (req.uri.path == '/users/del') {
+      if (req.headers['adminpass'] != null && generateMd5(req.headers.value('adminpass')) == adminpass) {
+        if (req.requestedUri.queryParameters['user'] != null) {
+          if (users[req.requestedUri.queryParameters['user']] != null) {
+            users.remove(req.requestedUri.queryParameters['user']);
+            usersFile.writeAsString(json.encode(users));
+            req.response.write('0');
+          } else {
+            print('user not exist');
+            req.response.write('-2');
+          }
+        } else {
+          req.response.write('-5');
+        }
+      } else {
+        print('unauthorized');
+        req.response.write('-100');
+      }
+    }
+    if (req.uri.path == '/users/add') {
+      if (req.headers['adminpass'] != null && generateMd5(req.headers.value('adminpass')) == adminpass) {
+        if (req.requestedUri.queryParameters['login'] != null && req.requestedUri.queryParameters['password'] != null && req.requestedUri.queryParameters['access'] != null) {
+          if (users[req.requestedUri.queryParameters['login']] == null) {
+            bool newUserPermsCreate;
+            bool newUserPermsEdit;
+            bool newUserPermsRemove;
+            req.requestedUri.queryParameters['access']![0] == "1" ? newUserPermsCreate = true : newUserPermsCreate = false;
+            req.requestedUri.queryParameters['access']![1] == "1" ? newUserPermsEdit = true : newUserPermsEdit = false;
+            req.requestedUri.queryParameters['access']![2] == "1" ? newUserPermsRemove = true : newUserPermsRemove = false;
+            User newUser = User(
+              password: generateMd5(req.requestedUri.queryParameters['password']),
+              newAccess: {
+                'create': newUserPermsCreate,
+                'edit': newUserPermsEdit,
+                'remove': newUserPermsRemove
+              }
+            );
+            users[req.requestedUri.queryParameters['login']!] = newUser;
+            print(users);
+            usersFile.writeAsString(json.encode(users));
+            req.response.write('0');
+          } else {
+            print('user already exist');
+            req.response.write('-1');
+          }
+        } else {
+          req.response.write('-5');
+        }
+      } else {
+        print('unauthorized');
+        req.response.write('-100');
+      }
+    }
+
+    if (req.headers['login'] != null && req.headers['password'] != null && users[req.headers.value('login')]?.password == generateMd5(req.headers.value('password'))) {
       if (req.uri.path.startsWith('/fosc/')) {
         switch (req.requestedUri.queryParameters.keys.first) {
           case 'list':

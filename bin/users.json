@@ -1,18 +1,1 @@
-{
-    "testuser": {
-        "password": "e16b2ab8d12314bf4efbd6203906ea6c",
-        "access": {
-            "create": true,
-            "edit": true,
-            "remove": false
-        }
-    },
-    "user2": {
-        "password": "e16b2ab8d12314bf4efbd6203906ea6c",
-        "access": {
-            "create": false,
-            "edit": false,
-            "remove": false
-        }
-    }
-}
+{}
