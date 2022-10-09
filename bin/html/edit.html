@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+</head>
+<body>
+    <fieldset style="width: 350px">
+        <legend>Edit user</legend>
+        User login:
+        <input type="text" id="userLogin" placeholder="User login">
+        <input type="checkbox" id="userDisabled">
+        <label for="userDisabled">Disable user</label><br>
+        New password (lave blank to keep current):
+        <input type="password" id="userPassword" placeholder="User new password"><br>
+        <fieldset>
+            <legend>User permissions</legend>
+            <input type="checkbox" id="userPermsCreate">
+            <label for="userPermsCreate">Create</label>
+            <input type="checkbox" id="userPermsEdit">
+            <label for="userPermsEdit">Edit</label>
+            <input type="checkbox" id="userPermsRemove">
+            <label for="userPermsRemove">Remove</label>
+        </fieldset><br>
+        <input type="button" value="Save" onclick="updateUser()">
+    </fieldset>
+    <script>
+        var userLogin       = document.getElementById("userLogin");
+        var userPassword    = document.getElementById("userPassword");
+        var userPermsCreate = document.getElementById("userPermsCreate");
+        var userPermsEdit   = document.getElementById("userPermsEdit");
+        var userPermsRemove = document.getElementById("userPermsRemove");
+        var userDisabled = document.getElementById("userDisabled");
+        const urlParams = new URLSearchParams(window.location.search);
+
+        function updateUser() {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", `/users/edit?user=${urlParams.get("user")}&login=${userLogin.value}&password=${userPassword.value}&access=${+userPermsCreate.checked}${+userPermsEdit.checked}${+userPermsRemove.checked}&disabled=${+userDisabled.checked}`, false );
+            xmlHttp.setRequestHeader("adminpass", urlParams.get("adminpass"));
+            xmlHttp.send( null );
+            window.close();
+        }
+
+        function onLoad() {
+            console.log(urlParams);
+            userLogin.value = urlParams.get("user");
+            var access = urlParams.get("access");
+            access.charAt(0) == "1" ? userPermsCreate.checked = true : userPermsCreate.checked = false;
+            access.charAt(1) == "1" ? userPermsEdit.checked = true : userPermsEdit.checked = false;
+            access.charAt(2) == "1" ? userPermsRemove.checked = true : userPermsRemove.checked = false;
+            urlParams.get("disabled") == "1" ? userDisabled.checked = true : userDisabled.checked = false;
+        }
+        onLoad();
+    </script>
+</body>
+</html>
