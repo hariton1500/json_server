@@ -19,6 +19,8 @@ Future<String> run() async {
 
   HttpServer server;
 
+  final editPageFile = File(
+      path.join(path.dirname(Platform.script.toFilePath()), 'html/edit.html'));
   final adminFile = File(
       path.join(path.dirname(Platform.script.toFilePath()), 'admin.json'));
   final usersPageFile = File(
@@ -93,6 +95,10 @@ Future<String> run() async {
       req.response.headers.contentType = ContentType.html;
       req.response.write(await usersPageFile.readAsString());
     }
+    if (req.uri.path == '/edit.html') {
+      req.response.headers.contentType = ContentType.html;
+      req.response.write(await editPageFile.readAsString());
+    }
     if (req.uri.path == '/users/list') {
       if (req.headers['adminpass'] != null && generateMd5(req.headers.value('adminpass')) == adminpass) {
         print(users);
@@ -108,6 +114,45 @@ Future<String> run() async {
         if (req.requestedUri.queryParameters['user'] != null) {
           if (users[req.requestedUri.queryParameters['user']] != null) {
             users.remove(req.requestedUri.queryParameters['user']);
+            usersFile.writeAsString(json.encode(users));
+            req.response.write('0');
+          } else {
+            print('user not exist');
+            req.response.write('-2');
+          }
+        } else {
+          req.response.write('-5');
+        }
+      } else {
+        print('unauthorized');
+        req.response.write('-100');
+      }
+    }
+    if (req.uri.path == '/users/edit') {
+      if (req.headers['adminpass'] != null && generateMd5(req.headers.value('adminpass')) == adminpass) {
+        if (req.requestedUri.queryParameters['user'] != null && req.requestedUri.queryParameters['password'] != null && req.requestedUri.queryParameters['access'] != null) {
+          if (users[req.requestedUri.queryParameters['user']] != null) {
+            bool userPermsCreate;
+            bool userPermsEdit;
+            bool userPermsRemove;
+            bool userDisabled;
+            req.requestedUri.queryParameters['access']![0] == "1" ? userPermsCreate = true : userPermsCreate = false;
+            req.requestedUri.queryParameters['access']![1] == "1" ? userPermsEdit = true : userPermsEdit = false;
+            req.requestedUri.queryParameters['access']![2] == "1" ? userPermsRemove = true : userPermsRemove = false;
+            req.requestedUri.queryParameters['disabled']! == "1" ? userDisabled = true : userDisabled = false;
+            users[req.requestedUri.queryParameters['user']]!.access['create'] = userPermsCreate;
+            users[req.requestedUri.queryParameters['user']]!.access['edit'] = userPermsEdit;
+            users[req.requestedUri.queryParameters['user']]!.access['remove'] = userPermsRemove;
+            if (req.requestedUri.queryParameters['password'] != "") {
+              users[req.requestedUri.queryParameters['user']]!.password = generateMd5(req.requestedUri.queryParameters['password']);
+            } else {
+              print('keep previous password');
+            }
+            users[req.requestedUri.queryParameters['user']]!.disabled = userDisabled;
+            if (req.requestedUri.queryParameters['login'] != req.requestedUri.queryParameters['user']) {
+              users[req.requestedUri.queryParameters['login']!] = users[req.requestedUri.queryParameters['user']]!;
+              users.remove(req.requestedUri.queryParameters['user']);
+            }
             usersFile.writeAsString(json.encode(users));
             req.response.write('0');
           } else {
@@ -157,7 +202,7 @@ Future<String> run() async {
       }
     }
 
-    if (req.headers['login'] != null && req.headers['password'] != null && users[req.headers.value('login')]?.password == generateMd5(req.headers.value('password'))) {
+    if (req.headers['login'] != null && req.headers['password'] != null && users[req.headers.value('login')]?.disabled == false && users[req.headers.value('login')]?.password == generateMd5(req.headers.value('password'))) {
       if (req.uri.path.startsWith('/fosc/')) {
         switch (req.requestedUri.queryParameters.keys.first) {
           case 'list':

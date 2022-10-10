@@ -41,6 +41,7 @@
     <table id="usersTable" style="display: none">
         <thead>
             <tr>
+                <th></th>
                 <th>User login</th>
                 <th>Create</th>
                 <th>Edit</th>
@@ -80,27 +81,14 @@
             return xmlHttp.responseText;
         }
 
-        function editUser(login) {
-            var win = window.open("", "Edit User", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=400,height=230,top="+(screen.height/3)+",left="+(screen.width/3));
-            win.document.title = "Edit User";
-            win.document.body.innerHTML = `
-            <fieldset style="width: 350px">
-                <legend>Edit user</legend>
-                User login:
-                <input type="text" id="newUserLogin" placeholder="User login" value="${login}"><br>
-                New password (lave blank to keep current):
-                <input type="password" id="newUserPassword" placeholder="User new password"><br>
-                <fieldset>
-                    <legend>User permissions</legend>
-                    <input type="checkbox" id="newUserPermsCreate">
-                    <label for="newUserPermsCreate">Create</label>
-                    <input type="checkbox" id="newUserPermsEdit">
-                    <label for="newUserPermsEdit">Edit</label>
-                    <input type="checkbox" id="newUserPermsRemove">
-                    <label for="newUserPermsRemove">Remove</label>
-                </fieldset><br>
-                <input type="button" value="Save" onclick="createNewUser()">
-            </fieldset>`;
+        function editUser(login, userPermsCreate, userPermsEdit, userPermsRemove, userDisabled) {
+            var win = window.open(`/edit.html?user=${login}&adminpass=${adminPassword.value}&access=${+userPermsCreate}${+userPermsEdit}${+userPermsRemove}&disabled=${+userDisabled}`, "Edit User", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=400,height=230,top=200,left=400");
+            var timer = setInterval(function() {   
+                if(win.closed) {  
+                    clearInterval(timer);  
+                    loadUsersTable();
+                }  
+            }, 100);
         }
 
         function deleteUser(user) {
@@ -126,6 +114,8 @@
                 for (var login in resp) {
                     var row = usersTableBody.insertRow();
                     var cell = row.insertCell();
+                    resp[login].disabled == true ? cell.innerHTML = "D" : cell.innerHTML = "E";
+                    var cell = row.insertCell();
                     cell.innerHTML = login;
                     var cell = row.insertCell();
                     cell.innerHTML = resp[login].access.create;
@@ -134,7 +124,7 @@
                     var cell = row.insertCell();
                     cell.innerHTML = resp[login].access.remove;
                     var cell = row.insertCell();
-                    cell.innerHTML = `<input type="button" value="Edit" onclick="editUser('${login}')">`;
+                    cell.innerHTML = `<input type="button" value="Edit" onclick="editUser('${login}',${resp[login].access.create},${resp[login].access.edit},${resp[login].access.remove},${resp[login].disabled})">`;
                     var cell = row.insertCell();
                     cell.innerHTML = `<input type="button" value="Delete" onclick="deleteUser('${login}')">`;
                 }
