@@ -91,6 +91,8 @@ Future<String> run() async {
       preserveHeaderCase: true,
     );
 
+    print('[${req.connectionInfo?.remoteAddress.address}] -> ${req.uri.path} -> ${req.requestedUri.queryParameters}');
+
     if (req.uri.path == '/users' || req.uri.path == '/users/') {
       req.response.headers.contentType = ContentType.html;
       req.response.write(await usersPageFile.readAsString());
@@ -101,11 +103,11 @@ Future<String> run() async {
     }
     if (req.uri.path == '/users/list') {
       if (req.headers['adminpass'] != null && generateMd5(req.headers.value('adminpass')) == adminpass) {
-        print(users);
+        print('Users: ${users}');
         req.response.headers.contentType = ContentType.json;
         req.response.write(await usersFile.readAsString());
       } else {
-        print('unauthorized');
+        print('admin unauthorized');
         req.response.write('-100');
       }
     }
@@ -117,14 +119,14 @@ Future<String> run() async {
             usersFile.writeAsString(json.encode(users));
             req.response.write('0');
           } else {
-            print('user not exist');
+            print('user ${req.requestedUri.queryParameters['user']} not exist');
             req.response.write('-2');
           }
         } else {
           req.response.write('-5');
         }
       } else {
-        print('unauthorized');
+        print('admin unauthorized');
         req.response.write('-100');
       }
     }
@@ -156,14 +158,14 @@ Future<String> run() async {
             usersFile.writeAsString(json.encode(users));
             req.response.write('0');
           } else {
-            print('user not exist');
+            print('user ${req.requestedUri.queryParameters['user']} not exist');
             req.response.write('-2');
           }
         } else {
           req.response.write('-5');
         }
       } else {
-        print('unauthorized');
+        print('admin unauthorized');
         req.response.write('-100');
       }
     }
@@ -186,18 +188,18 @@ Future<String> run() async {
               }
             );
             users[req.requestedUri.queryParameters['login']!] = newUser;
-            print(users);
+            print('Users: ${users}');
             usersFile.writeAsString(json.encode(users));
             req.response.write('0');
           } else {
-            print('user already exist');
+            print('user ${req.requestedUri.queryParameters['user']} already exist');
             req.response.write('-1');
           }
         } else {
           req.response.write('-5');
         }
       } else {
-        print('unauthorized');
+        print('admin unauthorized');
         req.response.write('-100');
       }
     }
@@ -342,7 +344,7 @@ Future<String> run() async {
         }
       }
     } else {
-      print('unauthorized');
+      print('user unauthorized');
     }
     //req.response.writeln('ok');
     req.response.close();
