@@ -83,6 +83,7 @@ Future<String> run() async {
   print('Listening on http://${server.address.address}:${server.port}/');
 
   await for (HttpRequest req in server) {
+    print(DateTime.now());
     req.response.headers.contentType = ContentType.json;
     //CORS Header, so the anybody can use this
     req.response.headers.add(
