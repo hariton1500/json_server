@@ -16,4 +16,9 @@ class User {
   Map<String, dynamic>  toJson() {
     return {'password': password, 'access': access, 'disabled': disabled};
   }
+
+  @override
+  String toString() {
+    return 'User(password: $password; access: $access; disabled?: $disabled)';
+  }
 }
