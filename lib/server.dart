@@ -228,11 +228,13 @@ Future<String> run() async {
               targetFoscsFile.writeAsString(json.encode(fileFoscsContent));
               fileCablesContent.values.forEach((element) {
                 if (!element.isDeleted) {
-                  if (element.object!.end1!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.cableEnds[0].direction) {
-                    element.object!.end1!.location = fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.location;
+                  if (element.object!.end1!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.cableEnds[0].direction) {
+                    element.object!.end1!.location = fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.location;
+                    element.object!.points.first = fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.location!;
                   }
                   if (element.object!.end2!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.cableEnds[0].direction) {
-                    element.object!.end2!.location = fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.location;
+                    element.object!.end2!.location = fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.location;
+                    element.object!.points.last = fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.location!;
                   }
                 }
               });
@@ -250,11 +252,13 @@ Future<String> run() async {
               targetFoscsFile.writeAsString(json.encode(fileFoscsContent));
               fileCablesContent.values.forEach((element) {
                 if (!element.isDeleted) {
-                  if (element.object!.end1!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.cableEnds[0].direction) {
-                    element.object!.end1!.location = fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.location;
+                  if (element.object!.end1!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.cableEnds[0].direction) {
+                    element.object!.end1!.location = fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.location;
+                    element.object!.points.first = fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.location!;
                   }
-                  if (element.object!.end2!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.cableEnds[0].direction) {
-                    element.object!.end2!.location = fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.location;
+                  if (element.object!.end2!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.cableEnds[0].direction) {
+                    element.object!.end2!.location = fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.location;
+                    element.object!.points.last = fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.location!;
                   }
                 }
               });
