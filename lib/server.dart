@@ -186,7 +186,8 @@ Future<String> run() async {
                 'create': newUserPermsCreate,
                 'edit': newUserPermsEdit,
                 'remove': newUserPermsRemove
-              }
+              },
+              disabled: false,
             );
             users[req.requestedUri.queryParameters['login']!] = newUser;
             print('Users: ${users}');
