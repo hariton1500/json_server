@@ -186,7 +186,8 @@ Future<String> run() async {
                 'create': newUserPermsCreate,
                 'edit': newUserPermsEdit,
                 'remove': newUserPermsRemove
-              }
+              },
+              disabled: false,
             );
             users[req.requestedUri.queryParameters['login']!] = newUser;
             print('Users: ${users}');
@@ -225,6 +226,17 @@ Future<String> run() async {
                       object: Fosc.fromJson(
                           json.decode(Utf8Decoder().convert(await req.last)))));
               targetFoscsFile.writeAsString(json.encode(fileFoscsContent));
+              fileCablesContent.values.forEach((element) {
+                if (!element.isDeleted) {
+                  if (element.object!.end1!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.cableEnds[0].direction) {
+                    element.object!.end1!.location = fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.location;
+                  }
+                  if (element.object!.end2!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.cableEnds[0].direction) {
+                    element.object!.end2!.location = fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.location;
+                  }
+                }
+              });
+              targetCablesFile.writeAsString(json.encode(fileCablesContent));
             }
             break;
           case 'put':
@@ -236,6 +248,17 @@ Future<String> run() async {
                       object: Fosc.fromJson(
                           json.decode(Utf8Decoder().convert(await req.last)))));
               targetFoscsFile.writeAsString(json.encode(fileFoscsContent));
+              fileCablesContent.values.forEach((element) {
+                if (!element.isDeleted) {
+                  if (element.object!.end1!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.cableEnds[0].direction) {
+                    element.object!.end1!.location = fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.location;
+                  }
+                  if (element.object!.end2!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.cableEnds[0].direction) {
+                    element.object!.end2!.location = fileFoscsContent[req.requestedUri.queryParameters['key']!]!.object!.location;
+                  }
+                }
+              });
+              targetCablesFile.writeAsString(json.encode(fileCablesContent));
             }
             break;
           case 'remove':
