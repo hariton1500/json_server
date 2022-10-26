@@ -2,7 +2,6 @@ import 'package:latlong2/latlong.dart';
 
 import 'activedevice.dart';
 import 'cableend.dart';
-import 'fosc.dart';
 
 class Node {
   LatLng? location;

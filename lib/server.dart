@@ -11,7 +11,7 @@ import 'Models/user.dart';
 import 'Helpers/md5.dart';
 
 Future<String> run() async {
-  String adminpass = '';  
+  String adminpass = '';
   Map<String, User> users = {};
   Map<String, FoscRecord> fileFoscsContent = {};
   Map<String, NodeRecord> fileNodesContent = {};
@@ -21,12 +21,12 @@ Future<String> run() async {
 
   final editPageFile = File(
       path.join(path.dirname(Platform.script.toFilePath()), 'html/edit.html'));
-  final adminFile = File(
-      path.join(path.dirname(Platform.script.toFilePath()), 'admin.json'));
+  final adminFile =
+      File(path.join(path.dirname(Platform.script.toFilePath()), 'admin.json'));
   final usersPageFile = File(
       path.join(path.dirname(Platform.script.toFilePath()), 'html/users.html'));
-  final usersFile = File(
-      path.join(path.dirname(Platform.script.toFilePath()), 'users.json'));
+  final usersFile =
+      File(path.join(path.dirname(Platform.script.toFilePath()), 'users.json'));
   final targetFoscsFile = File(
       path.join(path.dirname(Platform.script.toFilePath()), 'dataFoscs.json'));
   final targetNodesFile = File(
@@ -40,8 +40,7 @@ Future<String> run() async {
 
   if (await usersFile.exists()) {
     users = (jsonDecode(await usersFile.readAsString()) as Map)
-        .map((key, value) =>
-            MapEntry<String, User>(key, User.fromJson(value)));
+        .map((key, value) => MapEntry<String, User>(key, User.fromJson(value)));
   } else {
     print("$targetFoscsFile doesn't exists, nothing to load");
   }
@@ -92,7 +91,8 @@ Future<String> run() async {
       preserveHeaderCase: true,
     );
 
-    print('[${req.connectionInfo?.remoteAddress.address}] -> ${req.uri.path} -> ${req.requestedUri.queryParameters}');
+    print(
+        '[${req.connectionInfo?.remoteAddress.address}] -> ${req.uri.path} -> ${req.requestedUri.queryParameters}');
 
     if (req.uri.path == '/users' || req.uri.path == '/users/') {
       req.response.headers.contentType = ContentType.html;
@@ -103,7 +103,8 @@ Future<String> run() async {
       req.response.write(await editPageFile.readAsString());
     }
     if (req.uri.path == '/users/list') {
-      if (req.headers['adminpass'] != null && generateMd5(req.headers.value('adminpass')) == adminpass) {
+      if (req.headers['adminpass'] != null &&
+          generateMd5(req.headers.value('adminpass')) == adminpass) {
         print('Users: ${users}');
         req.response.headers.contentType = ContentType.json;
         req.response.write(await usersFile.readAsString());
@@ -113,7 +114,8 @@ Future<String> run() async {
       }
     }
     if (req.uri.path == '/users/del') {
-      if (req.headers['adminpass'] != null && generateMd5(req.headers.value('adminpass')) == adminpass) {
+      if (req.headers['adminpass'] != null &&
+          generateMd5(req.headers.value('adminpass')) == adminpass) {
         if (req.requestedUri.queryParameters['user'] != null) {
           if (users[req.requestedUri.queryParameters['user']] != null) {
             users.remove(req.requestedUri.queryParameters['user']);
@@ -132,28 +134,46 @@ Future<String> run() async {
       }
     }
     if (req.uri.path == '/users/edit') {
-      if (req.headers['adminpass'] != null && generateMd5(req.headers.value('adminpass')) == adminpass) {
-        if (req.requestedUri.queryParameters['user'] != null && req.requestedUri.queryParameters['password'] != null && req.requestedUri.queryParameters['access'] != null) {
+      if (req.headers['adminpass'] != null &&
+          generateMd5(req.headers.value('adminpass')) == adminpass) {
+        if (req.requestedUri.queryParameters['user'] != null &&
+            req.requestedUri.queryParameters['password'] != null &&
+            req.requestedUri.queryParameters['access'] != null) {
           if (users[req.requestedUri.queryParameters['user']] != null) {
             bool userPermsCreate;
             bool userPermsEdit;
             bool userPermsRemove;
             bool userDisabled;
-            req.requestedUri.queryParameters['access']![0] == "1" ? userPermsCreate = true : userPermsCreate = false;
-            req.requestedUri.queryParameters['access']![1] == "1" ? userPermsEdit = true : userPermsEdit = false;
-            req.requestedUri.queryParameters['access']![2] == "1" ? userPermsRemove = true : userPermsRemove = false;
-            req.requestedUri.queryParameters['disabled']! == "1" ? userDisabled = true : userDisabled = false;
-            users[req.requestedUri.queryParameters['user']]!.access['create'] = userPermsCreate;
-            users[req.requestedUri.queryParameters['user']]!.access['edit'] = userPermsEdit;
-            users[req.requestedUri.queryParameters['user']]!.access['remove'] = userPermsRemove;
+            req.requestedUri.queryParameters['access']![0] == "1"
+                ? userPermsCreate = true
+                : userPermsCreate = false;
+            req.requestedUri.queryParameters['access']![1] == "1"
+                ? userPermsEdit = true
+                : userPermsEdit = false;
+            req.requestedUri.queryParameters['access']![2] == "1"
+                ? userPermsRemove = true
+                : userPermsRemove = false;
+            req.requestedUri.queryParameters['disabled']! == "1"
+                ? userDisabled = true
+                : userDisabled = false;
+            users[req.requestedUri.queryParameters['user']]!.access['create'] =
+                userPermsCreate;
+            users[req.requestedUri.queryParameters['user']]!.access['edit'] =
+                userPermsEdit;
+            users[req.requestedUri.queryParameters['user']]!.access['remove'] =
+                userPermsRemove;
             if (req.requestedUri.queryParameters['password'] != "") {
-              users[req.requestedUri.queryParameters['user']]!.password = generateMd5(req.requestedUri.queryParameters['password']);
+              users[req.requestedUri.queryParameters['user']]!.password =
+                  generateMd5(req.requestedUri.queryParameters['password']);
             } else {
               print('keep previous password');
             }
-            users[req.requestedUri.queryParameters['user']]!.disabled = userDisabled;
-            if (req.requestedUri.queryParameters['login'] != req.requestedUri.queryParameters['user']) {
-              users[req.requestedUri.queryParameters['login']!] = users[req.requestedUri.queryParameters['user']]!;
+            users[req.requestedUri.queryParameters['user']]!.disabled =
+                userDisabled;
+            if (req.requestedUri.queryParameters['login'] !=
+                req.requestedUri.queryParameters['user']) {
+              users[req.requestedUri.queryParameters['login']!] =
+                  users[req.requestedUri.queryParameters['user']]!;
               users.remove(req.requestedUri.queryParameters['user']);
             }
             usersFile.writeAsString(json.encode(users));
@@ -171,17 +191,27 @@ Future<String> run() async {
       }
     }
     if (req.uri.path == '/users/add') {
-      if (req.headers['adminpass'] != null && generateMd5(req.headers.value('adminpass')) == adminpass) {
-        if (req.requestedUri.queryParameters['login'] != null && req.requestedUri.queryParameters['password'] != null && req.requestedUri.queryParameters['access'] != null) {
+      if (req.headers['adminpass'] != null &&
+          generateMd5(req.headers.value('adminpass')) == adminpass) {
+        if (req.requestedUri.queryParameters['login'] != null &&
+            req.requestedUri.queryParameters['password'] != null &&
+            req.requestedUri.queryParameters['access'] != null) {
           if (users[req.requestedUri.queryParameters['login']] == null) {
             bool newUserPermsCreate;
             bool newUserPermsEdit;
             bool newUserPermsRemove;
-            req.requestedUri.queryParameters['access']![0] == "1" ? newUserPermsCreate = true : newUserPermsCreate = false;
-            req.requestedUri.queryParameters['access']![1] == "1" ? newUserPermsEdit = true : newUserPermsEdit = false;
-            req.requestedUri.queryParameters['access']![2] == "1" ? newUserPermsRemove = true : newUserPermsRemove = false;
+            req.requestedUri.queryParameters['access']![0] == "1"
+                ? newUserPermsCreate = true
+                : newUserPermsCreate = false;
+            req.requestedUri.queryParameters['access']![1] == "1"
+                ? newUserPermsEdit = true
+                : newUserPermsEdit = false;
+            req.requestedUri.queryParameters['access']![2] == "1"
+                ? newUserPermsRemove = true
+                : newUserPermsRemove = false;
             User newUser = User(
-              password: generateMd5(req.requestedUri.queryParameters['password']),
+              password:
+                  generateMd5(req.requestedUri.queryParameters['password']),
               newAccess: {
                 'create': newUserPermsCreate,
                 'edit': newUserPermsEdit,
@@ -194,7 +224,8 @@ Future<String> run() async {
             usersFile.writeAsString(json.encode(users));
             req.response.write('0');
           } else {
-            print('user ${req.requestedUri.queryParameters['user']} already exist');
+            print(
+                'user ${req.requestedUri.queryParameters['user']} already exist');
             req.response.write('-1');
           }
         } else {
@@ -206,7 +237,11 @@ Future<String> run() async {
       }
     }
 
-    if (req.headers['login'] != null && req.headers['password'] != null && users[req.headers.value('login')]?.disabled == false && users[req.headers.value('login')]?.password == generateMd5(req.headers.value('password'))) {
+    if (req.headers['login'] != null &&
+        req.headers['password'] != null &&
+        users[req.headers.value('login')]?.disabled == false &&
+        users[req.headers.value('login')]?.password ==
+            generateMd5(req.headers.value('password'))) {
       if (req.uri.path.startsWith('/fosc/')) {
         switch (req.requestedUri.queryParameters.keys.first) {
           case 'list':
@@ -226,6 +261,7 @@ Future<String> run() async {
                       object: Fosc.fromJson(
                           json.decode(Utf8Decoder().convert(await req.last)))));
               targetFoscsFile.writeAsString(json.encode(fileFoscsContent));
+              /*
               fileCablesContent.values.forEach((element) {
                 if (!element.isDeleted) {
                   if (element.object!.end1!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.cableEnds[0].direction) {
@@ -238,7 +274,7 @@ Future<String> run() async {
                   }
                 }
               });
-              targetCablesFile.writeAsString(json.encode(fileCablesContent));
+              targetCablesFile.writeAsString(json.encode(fileCablesContent));*/
             }
             break;
           case 'put':
@@ -250,6 +286,7 @@ Future<String> run() async {
                       object: Fosc.fromJson(
                           json.decode(Utf8Decoder().convert(await req.last)))));
               targetFoscsFile.writeAsString(json.encode(fileFoscsContent));
+              /*
               fileCablesContent.values.forEach((element) {
                 if (!element.isDeleted) {
                   if (element.object!.end1!.direction == fileFoscsContent[req.requestedUri.queryParameters['key']]!.object!.cableEnds[0].direction) {
@@ -262,7 +299,7 @@ Future<String> run() async {
                   }
                 }
               });
-              targetCablesFile.writeAsString(json.encode(fileCablesContent));
+              targetCablesFile.writeAsString(json.encode(fileCablesContent));*/
             }
             break;
           case 'remove':
