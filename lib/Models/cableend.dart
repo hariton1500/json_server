@@ -1,5 +1,4 @@
 import 'package:latlong2/latlong.dart';
-
 import '../Helpers/fibers.dart';
 
 class CableEnd {
@@ -9,11 +8,9 @@ class CableEnd {
   int fibersNumber = 0;
   String? colorScheme;
   List<String> fiberComments = [];
-  //List<int> withSpliter = [];
   Map<int, double> fiberPosY = {};
   List<int> spliters = [];
   LatLng? location;
-  //Function callback = (Object asd) {};
 
   CableEnd(
       {required this.id,
