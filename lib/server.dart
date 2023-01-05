@@ -252,6 +252,7 @@ Future<String> run() async {
                     .where((element) => !element.isDeleted)
                     .map((e) => json.encode(e.object)),
                 '\n');
+            print('listed ${fileFoscsContent.values.length} foscs');
             break;
           case 'add':
             if (users[req.headers.value('login')]?.access['create']) {
@@ -373,6 +374,7 @@ Future<String> run() async {
                     .where((element) => !element.isDeleted)
                     .map((e) => json.encode(e.object)),
                 '\n');
+            print('listed ${fileCablesContent.values.length} cables');
             await req.response.close();
             break;
           case 'add':
