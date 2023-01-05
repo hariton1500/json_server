@@ -8,8 +8,8 @@ class Cable {
   Cable({required this.end1, required this.end2});
 
   Cable.fromJson(Map<String, dynamic> json) {
-    end1 = json['end1'];
-    end2 = json['end2'];
+    end1 = json['end1'].toString();
+    end2 = json['end2'].toString();
     try {
       points =
           List.from(json['points']).map((x) => LatLng.fromJson(x)).toList();
