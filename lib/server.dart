@@ -380,7 +380,7 @@ Future<String> run() async {
               print('adding new cable');
               String utfDecoderOutString = Utf8Decoder().convert(await req.last);
               print('utfdecoderstring = $utfDecoderOutString');
-              dynamic jsonDecodeResult = json.decode(utfDecoderOutString);
+              var jsonDecodeResult = json.decode(utfDecoderOutString);
               print('jsondecoderes = $jsonDecodeResult');
               fileCablesContent[req.requestedUri.queryParameters['key']!] =
                   (CableRecord(
