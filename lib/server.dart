@@ -378,10 +378,13 @@ Future<String> run() async {
           case 'add':
             if (users[req.headers.value('login')]?.access['create']) {
               print('adding new cable');
+              String utfDecoderOutString = Utf8Decoder().convert(await req.last);
+              print('utfdecoderstring = $utfDecoderOutString');
+              dynamic jsonDecodeResult = json.decode(utfDecoderOutString);
+              print('jsondecoderes = $jsonDecodeResult');
               fileCablesContent[req.requestedUri.queryParameters['key']!] =
                   (CableRecord(
-                      object: Cable.fromJson(
-                          json.decode(Utf8Decoder().convert(await req.last)))));
+                      object: Cable.fromJson(jsonDecodeResult)));
               targetCablesFile.writeAsString(json.encode(fileCablesContent));
               req.response.close();
             }
